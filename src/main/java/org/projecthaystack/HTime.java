@@ -151,6 +151,12 @@ public class HTime extends HVal
     return s.toString();
   }
 
+  /** Convenience implementation of toString */
+  public String toString()
+  {
+    return toZinc();
+  }
+
   /** Package private implementation shared with HDateTime */
   void encode(StringBuffer s)
   {

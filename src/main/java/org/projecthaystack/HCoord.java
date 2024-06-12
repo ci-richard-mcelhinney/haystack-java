@@ -98,7 +98,7 @@ public class HCoord extends HVal
     return s.toString();
   }
 
-  private static String uToStr(int ud)
+  public static String uToStr(int ud)
   {
     StringBuffer s = new StringBuffer();
     if (ud < 0) { s.append('-'); ud = -ud; }

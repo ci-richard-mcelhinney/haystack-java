@@ -215,6 +215,12 @@ public class HDateTime extends HVal
     return s.toString();
   }
 
+  /** Convenience implementation */
+  public String toString()
+  {
+    return toZinc();
+  }
+
   private void encode(StringBuffer s)
   {
     date.encode(s);

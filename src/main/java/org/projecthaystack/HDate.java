@@ -117,6 +117,12 @@ public class HDate extends HVal
     return s.toString();
   }
 
+  /** Convenience implementation */
+  public String toString()
+  {
+    return toZinc();
+  }
+
   /** Package private implementation shared with HDateTime */
   void encode(StringBuffer s)
   {
