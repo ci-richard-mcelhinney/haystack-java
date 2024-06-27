@@ -20,5 +20,31 @@ public class HaysonTest
     exp = "\"_kind\": \"date\", \"val\": \"2024-06-12\"";
     assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
   }
+
+  @Test
+  public void testSimpleZinc()
+  {
+    try
+    {
+      HGrid grid = new HZincReader(simpleZinc).readGrid();
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+  private static String simpleZinc;
+
+  static
+  {
+    StringBuffer buf = new StringBuffer();
+    buf.append("ver:\"3.0\" projName:\"test\"");
+    buf.append("dis dis:\"Equip Name\",equip,siteRef,installed");
+    buf.append("\"RTU-1\",M,@153c-699a \"HQ\",2005-06-01");
+    buf.append("\"RTU-2\",M,@153c-699b \"Library\",1999-07-12");
+
+    simpleZinc = buf.toString();
+  }
 }
 
