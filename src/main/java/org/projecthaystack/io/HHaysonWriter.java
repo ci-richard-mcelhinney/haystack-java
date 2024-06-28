@@ -213,7 +213,7 @@ public class HHaysonWriter extends HGridWriter
 
   private void writeTime(HTime val)
   {
-    out.print("\"_kind\": \"time\", \"val\": " + val.toString());
+    out.print("\"_kind\": \"time\", \"val\": \"" + val.toString() + "\"");
   }
 
   private void writeDateTime(HDateTime val)
@@ -227,12 +227,12 @@ public class HHaysonWriter extends HGridWriter
 
   private void writeUri(HUri val)
   {
-    out.print("\"_kind\": \"uri\", \"val:\"  \"" + val.toString() + "\"");
+    out.print("\"_kind\": \"uri\", \"val\": \"" + val.toString() + "\"");
   }
 
   private void writeSymbol(HSymbol val)
   {
-    out.print("\"_kind: \"symbol\", \"val:\"  \"" + val.toString() + "\"");
+    out.print("\"_kind\": \"symbol\", \"val\": \"" + val.toString() + "\"");
   }
 
   private void writeCoord(HCoord val)

@@ -19,6 +19,40 @@ public class HaysonTest
     val = HDate.make(2024, 06, 12);
     exp = "\"_kind\": \"date\", \"val\": \"2024-06-12\"";
     assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
+
+    val = HTime.make(17, 19, 23);
+    exp = "\"_kind\": \"time\", \"val\": \"17:19:23\"";
+    assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
+
+    val = HMarker.VAL;
+    exp = "{\"_kind\":\"marker\"}";
+    assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
+
+    val = HRemove.VAL;
+    exp = "{\"_kind\":\"remove\"}";
+    assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
+
+    val = HSymbol.make("site");
+    exp = "\"_kind\": \"symbol\", \"val\": \"site\"";
+    assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
+
+    val = HUri.make("https://project-haystack.org"); 
+    exp = "\"_kind\": \"uri\", \"val\": \"https://project-haystack.org\"";
+    assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
+
+    val = HRef.make("abc-def");
+    exp = "\"_kind\": \"ref\", \"val\": \"@abc-def\"";
+    assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
+    val = HRef.make("abc-def", "Main Elec Meter");
+    exp = "\"_kind\": \"ref\", \"val\": \"@abc-def\", \"dis\": \"Main Elec Meter\"";
+    assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));    
+
+    val = HDateTime.make("2021-03-22T17:56:05.411Z");
+    exp = "\"_kind\": \"dateTime\", \"val\": \"2021-03-22T17:56:05.411Z\"";
+    assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
+    val = HDateTime.make("2021-03-22T13:57:00.381-04:00", "New_York");
+    exp = "\"_kind\": \"dateTime\", \"val\": \"2021-03-22T17:56:05.411Z\" \"tz\": \"New_York\"";
+    assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
   }
 
   @Test
@@ -39,10 +73,10 @@ public class HaysonTest
   static
   {
     StringBuffer buf = new StringBuffer();
-    buf.append("ver:\"3.0\" projName:\"test\"");
-    buf.append("dis dis:\"Equip Name\",equip,siteRef,installed");
-    buf.append("\"RTU-1\",M,@153c-699a \"HQ\",2005-06-01");
-    buf.append("\"RTU-2\",M,@153c-699b \"Library\",1999-07-12");
+    buf.append("ver:\"3.0\" projName:\"test\"\n");
+    buf.append("dis dis:\"Equip Name\",equip,siteRef,installed\n");
+    buf.append("\"RTU-1\",M,@153c-699a \"HQ\",2005-06-01\n");
+    buf.append("\"RTU-2\",M,@153c-699b \"Library\",1999-07-12\n");
 
     simpleZinc = buf.toString();
   }
