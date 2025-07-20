@@ -9,7 +9,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'war'
-    id 'com.jfrog.bintray' version '1.8.4'
+//    id 'com.jfrog.bintray' version '1.8.4'
     id 'idea'
 }
 
@@ -67,7 +67,7 @@ publishing {
 }
 
 String findProperty(String s) { project.findProperty(s) }
-
+/*
 bintray {
     user = findProperty("bintrayUser")
     key  = findProperty("bintrayApiKey")
@@ -80,7 +80,7 @@ bintray {
         vcsUrl  = 'https://github.com/skyfoundry/haystack-java'
     }
 }
-
+*/
 javadoc {
     if(JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
