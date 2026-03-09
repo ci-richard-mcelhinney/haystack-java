@@ -83,20 +83,20 @@ public class HHaysonWriter extends HGridWriter
     // meta
     HDict meta = grid.meta();
     String ver = meta.has("ver") ? meta.getStr("ver") : "4.0";
-    out.print("\"meta\": {\"ver\":"+ver+"\"");
+    out.print("\"meta\": {\"ver\":\""+ver+"\"");
     writeDictTags(grid.meta(), false);
     out.print("},\n");
 
     // columns
     boolean firstCol = true;
-    out.print("\"cols:\" [\n"); 
+    out.print("\"cols\": [\n");
     for (int i = 0; i < grid.numCols(); i++)
     {
       if (firstCol) firstCol = false; else out.print(",\n");
       out.print("{");
 
       HCol col = grid.col(i);
-      out.print("\"name\": " + col.name());
+      out.print("\"name\":\"" + col.name() + "\"");
       if (!col.meta().isEmpty())
       {
         out.print(",");
@@ -117,7 +117,7 @@ public class HHaysonWriter extends HGridWriter
       HRow row = grid.row(i);
       writeDict(row);
     }
-    out.print("\n],\n");
+    out.print("\n]\n");
 
     //grid end
     out.print("}\n");
@@ -150,7 +150,13 @@ public class HHaysonWriter extends HGridWriter
 
   private void writeList(HList list)
   {
-
+    out.print("[");
+    for (int i = 0; i < list.size(); i++)
+    {
+      if (i > 0) out.print(",");
+      writeVal(list.get(i));
+    }
+    out.print("]");
   }
 
   private void writeScalar(HVal val)
@@ -168,11 +174,11 @@ public class HHaysonWriter extends HGridWriter
     else if (val instanceof HSymbol)      writeSymbol((HSymbol)val);
     else if (val instanceof HCoord)       writeCoord((HCoord) val);
     else if (val instanceof HXStr)        writeXStr((HXStr) val);
+    else if (val instanceof HBin)         writeBin((HBin) val);
+    else if (val instanceof HSpan)        writeSpan((HSpan) val);
     else if (val == HMarker.VAL)          out.print("{\"_kind\":\"marker\"}");
     else if (val == HRemove.VAL)          out.print("{\"_kind\":\"remove\"}");
-//    else if (val == HNA.val)              out.print("{\"_kind\":\"na\"}");
-// TODO    else if (val instanceof HSpan)        writeScalar(XStr(val));
-// TODO    else if (val instanceof HBin)         writeScalar(XStr(val));
+    else if (val == HNA.VAL)              out.print("{\"_kind\":\"na\"}");
     else throw new RuntimeException("Unrecognized scalar: ");
   }
 
@@ -188,7 +194,20 @@ public class HHaysonWriter extends HGridWriter
 
   private void writeNum(HNum val)
   {
-
+    if (Double.isNaN(val.val) || Double.isInfinite(val.val) || val.unit != null)
+    {
+      out.print("{\"_kind\":\"number\",\"val\":");
+      if (Double.isNaN(val.val))                       out.print("\"NaN\"");
+      else if (val.val == Double.POSITIVE_INFINITY)    out.print("\"INF\"");
+      else if (val.val == Double.NEGATIVE_INFINITY)    out.print("\"-INF\"");
+      else                                             out.print(HNum.make(val.val).toZinc());
+      if (val.unit != null) out.print(",\"unit\":\"" + val.unit + "\"");
+      out.print("}");
+    }
+    else
+    {
+      out.print(HNum.make(val.val).toZinc());
+    }
   }
 
 //  private void writeNumber(HNumber val)
@@ -197,53 +216,60 @@ public class HHaysonWriter extends HGridWriter
 
   private void writeRef(HRef val)
   {
-    out.print("\"_kind\": \"ref\", \"val\": ");
-    out.print("\"" + val.toCode() + "\"");
-
+    out.print("{\"_kind\":\"ref\",\"val\":\"" + val.toCode() + "\"");
     if (val.dis != null)
-    {
-      out.print(", \"dis\": " + "\"" + val.dis + "\"");
-    }
+      out.print(",\"dis\":\"" + val.dis + "\"");
+    out.print("}");
   }
 
   private void writeDate(HDate val)
   {
-    out.print("\"_kind\": \"date\", \"val\": \"" + val.toString() + "\"");
+    out.print("{\"_kind\":\"date\",\"val\":\"" + val.toString() + "\"}");
   }
 
   private void writeTime(HTime val)
   {
-    out.print("\"_kind\": \"time\", \"val\": \"" + val.toString() + "\"");
+    out.print("{\"_kind\":\"time\",\"val\":\"" + val.toString() + "\"}");
   }
 
   private void writeDateTime(HDateTime val)
   {
-    out.print("\"_kind\": \"time\", \"val:\"  \"" + val.toString() + "\"");
-    if (!val.tz.equals(HTimeZone.DEFAULT))
-    {
-      out.print("\"tz: \"" + val.tz.toString() + "\"");
-    }
+    String zinc = val.toZinc();
+    String isoVal = zinc.substring(0, zinc.indexOf(' '));
+    out.print("{\"_kind\":\"dateTime\",\"val\":\"" + isoVal + "\"");
+    if (!val.tz.equals(HTimeZone.UTC))
+      out.print(",\"tz\":\"" + val.tz + "\"");
+    out.print("}");
   }
 
   private void writeUri(HUri val)
   {
-    out.print("\"_kind\": \"uri\", \"val\": \"" + val.toString() + "\"");
+    out.print("{\"_kind\":\"uri\",\"val\":\"" + val.toString() + "\"}");
   }
 
   private void writeSymbol(HSymbol val)
   {
-    out.print("\"_kind\": \"symbol\", \"val\": \"" + val.toString() + "\"");
+    out.print("{\"_kind\":\"symbol\",\"val\":\"" + val.toString() + "\"}");
   }
 
   private void writeCoord(HCoord val)
   {
-    out.print("\"_kind\": \"coord\", ");
-    out.print("\"lat\": \"" + HCoord.uToStr(val.ulat) + "\", ");
-    out.print("\"lng\": \"" + HCoord.uToStr(val.ulng) + "\"");
+    out.print("{\"_kind\":\"coord\",\"lat\":" + HCoord.uToStr(val.ulat) + ",\"lng\":" + HCoord.uToStr(val.ulng) + "}");
   }
 
   private void writeXStr(HXStr val)
   {
+    out.print("{\"_kind\":\"xstr\",\"type\":\"" + val.type + "\",\"val\":\"" + val.val + "\"}");
+  }
+
+  private void writeBin(HBin val)
+  {
+    out.print("{\"_kind\":\"xstr\",\"type\":\"Bin\",\"val\":\"" + val.mime + "\"}");
+  }
+
+  private void writeSpan(HSpan val)
+  {
+    out.print("{\"_kind\":\"xstr\",\"type\":\"Span\",\"val\":\"" + val.val + "\"}");
   }
 
   /* Flush the underlying output stream */
