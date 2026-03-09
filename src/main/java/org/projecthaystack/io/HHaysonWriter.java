@@ -83,20 +83,20 @@ public class HHaysonWriter extends HGridWriter
     // meta
     HDict meta = grid.meta();
     String ver = meta.has("ver") ? meta.getStr("ver") : "4.0";
-    out.print("\"meta\": {\"ver\":"+ver+"\"");
+    out.print("\"meta\": {\"ver\":\""+ver+"\"");
     writeDictTags(grid.meta(), false);
     out.print("},\n");
 
     // columns
     boolean firstCol = true;
-    out.print("\"cols:\" [\n"); 
+    out.print("\"cols\": [\n");
     for (int i = 0; i < grid.numCols(); i++)
     {
       if (firstCol) firstCol = false; else out.print(",\n");
       out.print("{");
 
       HCol col = grid.col(i);
-      out.print("\"name\": " + col.name());
+      out.print("\"name\":\"" + col.name() + "\"");
       if (!col.meta().isEmpty())
       {
         out.print(",");
@@ -117,7 +117,7 @@ public class HHaysonWriter extends HGridWriter
       HRow row = grid.row(i);
       writeDict(row);
     }
-    out.print("\n],\n");
+    out.print("\n]\n");
 
     //grid end
     out.print("}\n");

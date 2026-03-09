@@ -88,14 +88,21 @@ public class HaysonTest
   @Test
   public void testSimpleZinc()
   {
-    try
-    {
-      HGrid grid = new HZincReader(simpleZinc).readGrid();
-    }
-    catch (Exception e)
-    {
-      e.printStackTrace();
-    }
+    HGrid grid = new HZincReader(simpleZinc).readGrid();
+    String result = HHaysonWriter.gridToString(grid);
+
+    assertTrue(result.contains("\"_kind\": \"grid\""));
+    assertTrue(result.contains("\"ver\":\"4.0\""));
+    assertTrue(result.contains("\"projName\":\"test\""));
+    assertTrue(result.contains("\"name\":\"dis\""));
+    assertTrue(result.contains("\"name\":\"equip\""));
+    assertTrue(result.contains("\"name\":\"siteRef\""));
+    assertTrue(result.contains("\"name\":\"installed\""));
+    assertTrue(result.contains("\"RTU-1\""));
+    assertTrue(result.contains("\"RTU-2\""));
+    assertTrue(result.contains("{\"_kind\":\"marker\"}"));
+    assertTrue(result.contains("\"_kind\":\"ref\""));
+    assertTrue(result.contains("\"_kind\":\"date\""));
   }
 
   private static String simpleZinc;
