@@ -115,6 +115,72 @@ public class HaysonTest
   }
 
   @Test
+  public void testReadScalars()
+  {
+    // plain numbers
+    assertEquals(HNum.make(42),   new HHaysonReader("42").readVal());
+    assertEquals(HNum.make(3.14), new HHaysonReader("3.14").readVal());
+
+    // number with unit, NaN, INF
+    assertEquals(HNum.make(42, "m"),      new HHaysonReader("{\"_kind\":\"number\",\"val\":42,\"unit\":\"m\"}").readVal());
+    assertEquals(HNum.NaN,                new HHaysonReader("{\"_kind\":\"number\",\"val\":\"NaN\"}").readVal());
+    assertEquals(HNum.POS_INF,            new HHaysonReader("{\"_kind\":\"number\",\"val\":\"INF\"}").readVal());
+    assertEquals(HNum.NEG_INF,            new HHaysonReader("{\"_kind\":\"number\",\"val\":\"-INF\"}").readVal());
+
+    // string and bool
+    assertEquals(HStr.make("hello"),  new HHaysonReader("\"hello\"").readVal());
+    assertEquals(HBool.TRUE,          new HHaysonReader("true").readVal());
+    assertEquals(HBool.FALSE,         new HHaysonReader("false").readVal());
+
+    // marker, remove, NA
+    assertEquals(HMarker.VAL, new HHaysonReader("{\"_kind\":\"marker\"}").readVal());
+    assertEquals(HRemove.VAL, new HHaysonReader("{\"_kind\":\"remove\"}").readVal());
+    assertEquals(HNA.VAL,     new HHaysonReader("{\"_kind\":\"na\"}").readVal());
+
+    // ref
+    assertEquals(HRef.make("abc-def"),                  new HHaysonReader("{\"_kind\":\"ref\",\"val\":\"@abc-def\"}").readVal());
+    assertEquals(HRef.make("abc-def", "Main Elec Meter"), new HHaysonReader("{\"_kind\":\"ref\",\"val\":\"@abc-def\",\"dis\":\"Main Elec Meter\"}").readVal());
+
+    // date, time, datetime
+    assertEquals(HDate.make(2024, 6, 12),   new HHaysonReader("{\"_kind\":\"date\",\"val\":\"2024-06-12\"}").readVal());
+    assertEquals(HTime.make(17, 19, 23),    new HHaysonReader("{\"_kind\":\"time\",\"val\":\"17:19:23\"}").readVal());
+    assertEquals(HDateTime.make("2021-03-22T17:56:05.411Z"),             new HHaysonReader("{\"_kind\":\"dateTime\",\"val\":\"2021-03-22T17:56:05.411Z\"}").readVal());
+    assertEquals(HDateTime.make("2021-03-22T13:57:00.381-04:00 New_York"), new HHaysonReader("{\"_kind\":\"dateTime\",\"val\":\"2021-03-22T13:57:00.381-04:00\",\"tz\":\"New_York\"}").readVal());
+
+    // uri, symbol, coord
+    assertEquals(HUri.make("https://project-haystack.org"),  new HHaysonReader("{\"_kind\":\"uri\",\"val\":\"https://project-haystack.org\"}").readVal());
+    assertEquals(HSymbol.make("site"),                        new HHaysonReader("{\"_kind\":\"symbol\",\"val\":\"site\"}").readVal());
+    assertEquals(HCoord.make(39.56, 123.45),                  new HHaysonReader("{\"_kind\":\"coord\",\"lat\":39.56,\"lng\":123.45}").readVal());
+
+    // xstr, bin
+    assertEquals(HXStr.decode("Func", "main"), new HHaysonReader("{\"_kind\":\"xstr\",\"type\":\"Func\",\"val\":\"main\"}").readVal());
+    assertEquals(HBin.make("image/jpeg"),       new HHaysonReader("{\"_kind\":\"xstr\",\"type\":\"Bin\",\"val\":\"image/jpeg\"}").readVal());
+
+    // list
+    assertEquals(HList.make(new HVal[]{HNum.make(10), HNum.make(20), HNum.make(30)}), new HHaysonReader("[10,20,30]").readVal());
+  }
+
+  @Test
+  public void testReadGrid()
+  {
+    // round-trip: write simpleZinc grid then read it back
+    HGrid original = new HZincReader(simpleZinc).readGrid();
+    String hayson = HHaysonWriter.gridToString(original);
+    HGrid result  = new HHaysonReader(hayson).readGrid();
+
+    assertEquals(original.numCols(), result.numCols());
+    assertEquals(original.numRows(), result.numRows());
+    for (int i = 0; i < original.numCols(); i++)
+      assertEquals(original.col(i).name(), result.col(i).name());
+    for (int ri = 0; ri < original.numRows(); ri++)
+      for (int ci = 0; ci < original.numCols(); ci++)
+      {
+        String colName = original.col(ci).name();
+        assertEquals(original.row(ri).get(colName, false), result.row(ri).get(colName, false));
+      }
+  }
+
+  @Test
   public void testSimpleZinc()
   {
     HGrid grid = new HZincReader(simpleZinc).readGrid();
