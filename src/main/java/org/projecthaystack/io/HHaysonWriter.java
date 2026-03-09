@@ -263,6 +263,7 @@ public class HHaysonWriter extends HGridWriter
 
   private void writeXStr(HXStr val)
   {
+    out.print("{\"_kind\":\"xstr\",\"type\":\"" + val.type + "\",\"val\":\"" + val.val + "\"}");
   }
 
   /* Flush the underlying output stream */

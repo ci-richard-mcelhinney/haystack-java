@@ -64,6 +64,13 @@ public class HaysonTest
   }
 
   @Test
+  public void testXStr()
+  {
+    HVal val = HXStr.decode("Func", "main");
+    assertEquals("{\"_kind\":\"xstr\",\"type\":\"Func\",\"val\":\"main\"}", HHaysonWriter.writeVal(new StringWriter(), val));
+  }
+
+  @Test
   public void testList()
   {
     // empty list
