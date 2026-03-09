@@ -64,6 +64,13 @@ public class HaysonTest
   }
 
   @Test
+  public void testBin()
+  {
+    HVal val = HBin.make("image/jpeg");
+    assertEquals("{\"_kind\":\"xstr\",\"type\":\"Bin\",\"val\":\"image/jpeg\"}", HHaysonWriter.writeVal(new StringWriter(), val));
+  }
+
+  @Test
   public void testXStr()
   {
     HVal val = HXStr.decode("Func", "main");

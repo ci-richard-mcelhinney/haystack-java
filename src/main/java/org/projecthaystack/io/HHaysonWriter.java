@@ -174,11 +174,11 @@ public class HHaysonWriter extends HGridWriter
     else if (val instanceof HSymbol)      writeSymbol((HSymbol)val);
     else if (val instanceof HCoord)       writeCoord((HCoord) val);
     else if (val instanceof HXStr)        writeXStr((HXStr) val);
+    else if (val instanceof HBin)         writeBin((HBin) val);
     else if (val == HMarker.VAL)          out.print("{\"_kind\":\"marker\"}");
     else if (val == HRemove.VAL)          out.print("{\"_kind\":\"remove\"}");
 //    else if (val == HNA.val)              out.print("{\"_kind\":\"na\"}");
 // TODO    else if (val instanceof HSpan)        writeScalar(XStr(val));
-// TODO    else if (val instanceof HBin)         writeScalar(XStr(val));
     else throw new RuntimeException("Unrecognized scalar: ");
   }
 
@@ -260,6 +260,11 @@ public class HHaysonWriter extends HGridWriter
   private void writeXStr(HXStr val)
   {
     out.print("{\"_kind\":\"xstr\",\"type\":\"" + val.type + "\",\"val\":\"" + val.val + "\"}");
+  }
+
+  private void writeBin(HBin val)
+  {
+    out.print("{\"_kind\":\"xstr\",\"type\":\"Bin\",\"val\":\"" + val.mime + "\"}");
   }
 
   /* Flush the underlying output stream */
