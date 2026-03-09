@@ -216,32 +216,30 @@ public class HHaysonWriter extends HGridWriter
 
   private void writeRef(HRef val)
   {
-    out.print("\"_kind\": \"ref\", \"val\": ");
-    out.print("\"" + val.toCode() + "\"");
-
+    out.print("{\"_kind\":\"ref\",\"val\":\"" + val.toCode() + "\"");
     if (val.dis != null)
-    {
-      out.print(", \"dis\": " + "\"" + val.dis + "\"");
-    }
+      out.print(",\"dis\":\"" + val.dis + "\"");
+    out.print("}");
   }
 
   private void writeDate(HDate val)
   {
-    out.print("\"_kind\": \"date\", \"val\": \"" + val.toString() + "\"");
+    out.print("{\"_kind\":\"date\",\"val\":\"" + val.toString() + "\"}");
   }
 
   private void writeTime(HTime val)
   {
-    out.print("\"_kind\": \"time\", \"val\": \"" + val.toString() + "\"");
+    out.print("{\"_kind\":\"time\",\"val\":\"" + val.toString() + "\"}");
   }
 
   private void writeDateTime(HDateTime val)
   {
-    out.print("\"_kind\": \"time\", \"val:\"  \"" + val.toString() + "\"");
-    if (!val.tz.equals(HTimeZone.DEFAULT))
-    {
-      out.print("\"tz: \"" + val.tz.toString() + "\"");
-    }
+    String zinc = val.toZinc();
+    String isoVal = zinc.substring(0, zinc.indexOf(' '));
+    out.print("{\"_kind\":\"dateTime\",\"val\":\"" + isoVal + "\"");
+    if (!val.tz.equals(HTimeZone.UTC))
+      out.print(",\"tz\":\"" + val.tz + "\"");
+    out.print("}");
   }
 
   private void writeUri(HUri val)
