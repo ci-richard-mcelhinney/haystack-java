@@ -244,19 +244,17 @@ public class HHaysonWriter extends HGridWriter
 
   private void writeUri(HUri val)
   {
-    out.print("\"_kind\": \"uri\", \"val\": \"" + val.toString() + "\"");
+    out.print("{\"_kind\":\"uri\",\"val\":\"" + val.toString() + "\"}");
   }
 
   private void writeSymbol(HSymbol val)
   {
-    out.print("\"_kind\": \"symbol\", \"val\": \"" + val.toString() + "\"");
+    out.print("{\"_kind\":\"symbol\",\"val\":\"" + val.toString() + "\"}");
   }
 
   private void writeCoord(HCoord val)
   {
-    out.print("\"_kind\": \"coord\", ");
-    out.print("\"lat\": \"" + HCoord.uToStr(val.ulat) + "\", ");
-    out.print("\"lng\": \"" + HCoord.uToStr(val.ulng) + "\"");
+    out.print("{\"_kind\":\"coord\",\"lat\":" + HCoord.uToStr(val.ulat) + ",\"lng\":" + HCoord.uToStr(val.ulng) + "}");
   }
 
   private void writeXStr(HXStr val)

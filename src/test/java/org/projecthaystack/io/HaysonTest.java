@@ -21,7 +21,7 @@ public class HaysonTest
     assertEquals("{\"_kind\":\"number\",\"val\":\"-INF\"}", HHaysonWriter.writeVal(new StringWriter(), HNum.NEG_INF));
 
     val = HCoord.make(39.56, 123.45);
-    String exp = "\"_kind\": \"coord\", \"lat\": \"39.56\", \"lng\": \"123.45\"";
+    String exp = "{\"_kind\":\"coord\",\"lat\":39.56,\"lng\":123.45}";
     assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
 
     val = HDate.make(2024, 06, 12);
@@ -41,11 +41,11 @@ public class HaysonTest
     assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
 
     val = HSymbol.make("site");
-    exp = "\"_kind\": \"symbol\", \"val\": \"site\"";
+    exp = "{\"_kind\":\"symbol\",\"val\":\"site\"}";
     assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
 
-    val = HUri.make("https://project-haystack.org"); 
-    exp = "\"_kind\": \"uri\", \"val\": \"https://project-haystack.org\"";
+    val = HUri.make("https://project-haystack.org");
+    exp = "{\"_kind\":\"uri\",\"val\":\"https://project-haystack.org\"}";
     assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
 
     val = HRef.make("abc-def");
