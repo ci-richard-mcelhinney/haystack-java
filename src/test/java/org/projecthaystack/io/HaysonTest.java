@@ -64,6 +64,21 @@ public class HaysonTest
   }
 
   @Test
+  public void testList()
+  {
+    // empty list
+    assertEquals("[]", HHaysonWriter.writeVal(new StringWriter(), HList.EMPTY));
+
+    // list of scalars
+    HList list = HList.make(new HVal[] { HNum.make(10), HNum.make(20), HNum.make(30) });
+    assertEquals("[10,20,30]", HHaysonWriter.writeVal(new StringWriter(), list));
+
+    // mixed types
+    list = HList.make(new HVal[] { HStr.make("hello"), HBool.TRUE, HMarker.VAL });
+    assertEquals("[\"hello\",true,{\"_kind\":\"marker\"}]", HHaysonWriter.writeVal(new StringWriter(), list));
+  }
+
+  @Test
   public void testSimpleZinc()
   {
     try

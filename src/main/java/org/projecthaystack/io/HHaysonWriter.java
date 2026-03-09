@@ -150,7 +150,13 @@ public class HHaysonWriter extends HGridWriter
 
   private void writeList(HList list)
   {
-
+    out.print("[");
+    for (int i = 0; i < list.size(); i++)
+    {
+      if (i > 0) out.print(",");
+      writeVal(list.get(i));
+    }
+    out.print("]");
   }
 
   private void writeScalar(HVal val)
