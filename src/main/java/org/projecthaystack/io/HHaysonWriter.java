@@ -188,7 +188,20 @@ public class HHaysonWriter extends HGridWriter
 
   private void writeNum(HNum val)
   {
-
+    if (Double.isNaN(val.val) || Double.isInfinite(val.val) || val.unit != null)
+    {
+      out.print("{\"_kind\":\"number\",\"val\":");
+      if (Double.isNaN(val.val))                       out.print("\"NaN\"");
+      else if (val.val == Double.POSITIVE_INFINITY)    out.print("\"INF\"");
+      else if (val.val == Double.NEGATIVE_INFINITY)    out.print("\"-INF\"");
+      else                                             out.print(HNum.make(val.val).toZinc());
+      if (val.unit != null) out.print(",\"unit\":\"" + val.unit + "\"");
+      out.print("}");
+    }
+    else
+    {
+      out.print(HNum.make(val.val).toZinc());
+    }
   }
 
 //  private void writeNumber(HNumber val)

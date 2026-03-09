@@ -12,6 +12,14 @@ public class HaysonTest
   public void testScalars()
   {
     HVal val;
+    // HNum
+    assertEquals("42", HHaysonWriter.writeVal(new StringWriter(), HNum.make(42)));
+    assertEquals("3.14", HHaysonWriter.writeVal(new StringWriter(), HNum.make(3.14)));
+    assertEquals("{\"_kind\":\"number\",\"val\":42,\"unit\":\"m\"}", HHaysonWriter.writeVal(new StringWriter(), HNum.make(42, "m")));
+    assertEquals("{\"_kind\":\"number\",\"val\":\"NaN\"}", HHaysonWriter.writeVal(new StringWriter(), HNum.NaN));
+    assertEquals("{\"_kind\":\"number\",\"val\":\"INF\"}", HHaysonWriter.writeVal(new StringWriter(), HNum.POS_INF));
+    assertEquals("{\"_kind\":\"number\",\"val\":\"-INF\"}", HHaysonWriter.writeVal(new StringWriter(), HNum.NEG_INF));
+
     val = HCoord.make(39.56, 123.45);
     String exp = "\"_kind\": \"coord\", \"lat\": \"39.56\", \"lng\": \"123.45\"";
     assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
