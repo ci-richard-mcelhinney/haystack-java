@@ -178,7 +178,7 @@ public class HHaysonWriter extends HGridWriter
     else if (val instanceof HSpan)        writeSpan((HSpan) val);
     else if (val == HMarker.VAL)          out.print("{\"_kind\":\"marker\"}");
     else if (val == HRemove.VAL)          out.print("{\"_kind\":\"remove\"}");
-//    else if (val == HNA.val)              out.print("{\"_kind\":\"na\"}");
+    else if (val == HNA.VAL)              out.print("{\"_kind\":\"na\"}");
     else throw new RuntimeException("Unrecognized scalar: ");
   }
 

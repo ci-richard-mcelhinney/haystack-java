@@ -64,6 +64,12 @@ public class HaysonTest
   }
 
   @Test
+  public void testNA()
+  {
+    assertEquals("{\"_kind\":\"na\"}", HHaysonWriter.writeVal(new StringWriter(), HNA.VAL));
+  }
+
+  @Test
   public void testBin()
   {
     HVal val = HBin.make("image/jpeg");
