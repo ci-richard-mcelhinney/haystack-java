@@ -93,6 +93,22 @@ public class HaysonTest
   }
 
   @Test
+  public void testSpan()
+  {
+    // date span
+    HVal val = HSpan.make(HDate.make(2023, 1, 1), HDate.make(2023, 1, 31));
+    String exp = "{\"_kind\":\"xstr\",\"type\":\"Span\",\"val\":\"2023-01-01,2023-01-31\"}";
+    assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
+
+    // datetime span (UTC)
+    HDateTime start = HDateTime.make("2023-01-01T00:00:00Z UTC");
+    HDateTime end   = HDateTime.make("2023-01-31T23:59:59Z UTC");
+    val = HSpan.make(start, end);
+    exp = "{\"_kind\":\"xstr\",\"type\":\"Span\",\"val\":\"2023-01-01T00:00:00Z UTC,2023-01-31T23:59:59Z UTC\"}";
+    assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
+  }
+
+  @Test
   public void testSimpleZinc()
   {
     HGrid grid = new HZincReader(simpleZinc).readGrid();
