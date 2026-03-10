@@ -165,7 +165,6 @@ public class HHaysonWriter extends HGridWriter
     else if (val instanceof HStr)         writeStr((HStr) val);
     else if (val instanceof HBool)        writeBool((HBool) val);
     else if (val instanceof HNum)         writeNum((HNum) val);
-//    else if (val instanceof HNumber)      writeNumber((HNumber) val);
     else if (val instanceof HRef)         writeRef((HRef) val);
     else if (val instanceof HDate)        writeDate((HDate) val);
     else if (val instanceof HTime)        writeTime((HTime) val);
