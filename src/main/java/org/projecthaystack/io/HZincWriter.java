@@ -151,7 +151,6 @@ public class HZincWriter extends HGridWriter
     else
     {
       p(bin.toZinc());
-      p("Bin(").p('"').p(bin.mime).p('"').p(')');
     }
   }
 

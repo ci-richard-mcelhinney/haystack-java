@@ -72,6 +72,7 @@ public class HNum extends HVal
   private HNum(double val, String unit)
   {
     if (!isUnitName(unit)) throw new IllegalArgumentException("Invalid unit name: " + unit);
+    if (Double.isNaN(val) && unit != null) throw new IllegalArgumentException("NaN cannot have a unit");
     this.val = val;
     this.unit = unit;
   }

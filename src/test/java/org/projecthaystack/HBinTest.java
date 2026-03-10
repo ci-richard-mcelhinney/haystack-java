@@ -20,13 +20,21 @@ public class HBinTest extends HValTest
     assertEquals(HBin.make("text/plain"), HBin.make("text/plain"));
     assertNotEquals(HBin.make("text/plain"), HBin.make("text/xml"));
   }
-  // TODO:FIXIT
-//    // encoding
-//    verifyZinc(HBin.make("text/plain"), "Bin(\"text/plain\")");
-//    verifyZinc(HBin.make("text/plain; charset=utf-8"), "Bin(\"text/plain; charset=utf-8\")");
-//
-//    // verify bad bins are caught on encoding
-//    try { HBin.make("text/plain; f()").toZinc(); fail(); } catch (Exception e) { verifyException(e); }
-//    try { read("Bin()"); fail(); } catch (Exception e) { verifyException(e); }
-//    try { read("Bin(\"text\")"); fail(); } catch (Exception e) { verifyException(e); }
+  @Test
+  public void testEncoding()
+  {
+    verifyZinc(HBin.make("text/plain"), "Bin(\"text/plain\")");
+    verifyZinc(HBin.make("text/plain; charset=utf-8"), "Bin(\"text/plain; charset=utf-8\")");
+  }
+
+  @Test
+  public void testBadBins()
+  {
+    // mime containing ')' is invalid
+    try { HBin.make("text/plain; f()"); fail(); } catch (Exception e) { /* expected */ }
+    // Bin() with empty mime
+    try { read("Bin()"); fail(); } catch (Exception e) { /* expected */ }
+    // mime without '/' is invalid
+    try { read("Bin(\"text\")"); fail(); } catch (Exception e) { /* expected */ }
+  }
 }

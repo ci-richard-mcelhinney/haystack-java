@@ -51,8 +51,7 @@ public class HNumTest extends HValTest
     verifyZinc(HNum.make(Double.POSITIVE_INFINITY), "INF");
     verifyZinc(HNum.make(Double.NaN), "NaN");
 
-    // verify units never serialized for special values
-    assertEquals(HNum.make(Double.NaN, "ignore").toZinc(), "NaN");
+    // verify units not serialized for INF/-INF (discouraged but valid per spec)
     assertEquals(HNum.make(Double.POSITIVE_INFINITY, "%").toZinc(), "INF");
     assertEquals(HNum.make(Double.NEGATIVE_INFINITY, "%").toZinc(), "-INF");
   }
@@ -88,5 +87,12 @@ public class HNumTest extends HValTest
       {"foo bar"},
       {"foo,bar"},
     };
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void testNaNWithUnitInvalid()
+  {
+    // spec: "It is invalid for NaN to include a unit"
+    HNum.make(Double.NaN, "m");
   }
 }
