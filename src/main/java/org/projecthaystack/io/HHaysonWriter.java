@@ -200,19 +200,24 @@ public class HHaysonWriter extends HGridWriter
       if (Double.isNaN(val.val))                       out.print("\"NaN\"");
       else if (val.val == Double.POSITIVE_INFINITY)    out.print("\"INF\"");
       else if (val.val == Double.NEGATIVE_INFINITY)    out.print("\"-INF\"");
-      else                                             out.print(HNum.make(val.val).toZinc());
+      else                                             out.print(numToJson(val.val));
       if (val.unit != null) out.print(",\"unit\":\"" + val.unit + "\"");
       out.print("}");
     }
     else
     {
-      out.print(HNum.make(val.val).toZinc());
+      out.print(numToJson(val.val));
     }
   }
 
-//  private void writeNumber(HNumber val)
-//  {
-//  }
+  /** Encode a double as a full-precision JSON number.
+   *  Whole-number values are encoded without a decimal point (e.g. 42 not 42.0). */
+  private static String numToJson(double val)
+  {
+    if (val == Math.floor(val) && val >= Long.MIN_VALUE && val <= Long.MAX_VALUE)
+      return String.valueOf((long)val);
+    return String.valueOf(val);
+  }
 
   private void writeRef(HRef val)
   {

@@ -19,6 +19,9 @@ public class HaysonTest
     assertEquals("{\"_kind\":\"number\",\"val\":\"NaN\"}", HHaysonWriter.writeVal(new StringWriter(), HNum.NaN));
     assertEquals("{\"_kind\":\"number\",\"val\":\"INF\"}", HHaysonWriter.writeVal(new StringWriter(), HNum.POS_INF));
     assertEquals("{\"_kind\":\"number\",\"val\":\"-INF\"}", HHaysonWriter.writeVal(new StringWriter(), HNum.NEG_INF));
+    // full-precision encoding (would have been "3.1416" with toZinc())
+    assertEquals("3.14159265", HHaysonWriter.writeVal(new StringWriter(), HNum.make(3.14159265)));
+    assertEquals("{\"_kind\":\"number\",\"val\":123.456789,\"unit\":\"m\"}", HHaysonWriter.writeVal(new StringWriter(), HNum.make(123.456789, "m")));
 
     val = HCoord.make(39.56, 123.45);
     String exp = "{\"_kind\":\"coord\",\"lat\":39.56,\"lng\":123.45}";
