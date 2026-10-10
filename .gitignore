@@ -2,7 +2,7 @@
 .idea
 *.iml
 *.ipr
-*.iws
+*.iws 
 
 # Gradle
 build/
@@ -13,3 +13,7 @@ Thumbs.db
 .DS_Store
 .claude/
 bin/
+
+.classpath
+.project
+.settings/
