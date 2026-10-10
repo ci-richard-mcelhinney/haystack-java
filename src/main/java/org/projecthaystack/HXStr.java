@@ -19,6 +19,12 @@ public class HXStr extends HVal
   public static HVal decode(String type, String val)
   {
     if ("Bin".equals(type)) return HBin.make(val);
+    if ("Span".equals(type))
+    {
+      // named spans such as "today" are not modelled by HSpan yet
+      try { return HSpan.make(val); }
+      catch (ParseException e) { return new HXStr(type, val); }
+    }
     return new HXStr(type, val);
   }
 

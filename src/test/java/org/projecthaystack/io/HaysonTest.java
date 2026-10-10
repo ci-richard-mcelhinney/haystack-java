@@ -52,10 +52,10 @@ public class HaysonTest
     assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
 
     val = HRef.make("abc-def");
-    exp = "{\"_kind\":\"ref\",\"val\":\"@abc-def\"}";
+    exp = "{\"_kind\":\"ref\",\"val\":\"abc-def\"}";
     assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
     val = HRef.make("abc-def", "Main Elec Meter");
-    exp = "{\"_kind\":\"ref\",\"val\":\"@abc-def\",\"dis\":\"Main Elec Meter\"}";
+    exp = "{\"_kind\":\"ref\",\"val\":\"abc-def\",\"dis\":\"Main Elec Meter\"}";
     assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));    
 
     val = HDateTime.make("2021-03-22T17:56:05.411Z");
@@ -115,6 +115,17 @@ public class HaysonTest
     val = HSpan.make(start, end);
     exp = "{\"_kind\":\"xstr\",\"type\":\"Span\",\"val\":\"2023-01-01T00:00:00Z UTC,2023-01-31T23:59:59Z UTC\"}";
     assertEquals(exp, HHaysonWriter.writeVal(new StringWriter(), val));
+
+    // read back as HSpan
+    assertEquals(new HHaysonReader(exp).readVal(), val);
+    assertEquals(new HHaysonReader("{\"_kind\":\"xstr\",\"type\":\"Span\",\"val\":\"2023-01-01,2023-01-31\"}").readVal(),
+      HSpan.make(HDate.make(2023, 1, 1), HDate.make(2023, 1, 31)));
+
+    // named spans are not modelled by HSpan so stay a generic XStr
+    assertEquals(new HHaysonReader("{\"_kind\":\"xstr\",\"type\":\"Span\",\"val\":\"today\"}").readVal(),
+      HXStr.decode("Span", "today"));
+    assertFalse(HXStr.decode("Span", "today") instanceof HSpan);
+    assertFalse(HXStr.decode("Span", "2023-01-01,2023-01-31T00:00:00Z") instanceof HSpan);
   }
 
   @Test

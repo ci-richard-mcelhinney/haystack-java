@@ -29,6 +29,33 @@ public class HSpan extends HVal
     return new HSpan(start, end, start.toZinc() + "," + end.toZinc());
   }
 
+  /**
+   * Parse the "start,end" XStr encoding produced by the make factories.
+   * Both ends must be dates or both datetimes; throw ParseException otherwise.
+   */
+  public static HSpan make(String val) throws Exception
+  {
+    int comma = val.indexOf(',');
+    if (comma < 0 || val.indexOf(',', comma + 1) >= 0) 
+      throw new ParseException("Invalid span: " + val);
+
+    String start = val.substring(0, comma);
+    String end   = val.substring(comma + 1);
+    boolean startIsDate = start.indexOf('T') < 0;
+    boolean endIsDate   = end.indexOf('T') < 0;
+
+    if (startIsDate != endIsDate) 
+      throw new ParseException("Mixed date and datetime span: " + val);
+
+    try
+    {
+      if (startIsDate) return make(HDate.make(start), HDate.make(end));
+      return make(HDateTime.make(start), HDateTime.make(end));
+    }
+    catch (ParseException e) { throw e; }
+    catch (RuntimeException e) { throw new ParseException("Invalid span: " + val); }
+  }
+
   private HSpan(HVal start, HVal end, String val)
   {
     this.start = start;

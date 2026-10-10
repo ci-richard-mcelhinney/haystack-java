@@ -80,11 +80,11 @@ public class HHaysonWriter extends HGridWriter
     out.print("{\n");
     out.print("\"_kind\": \"grid\",\n");
     
-    // meta
+    // meta: ver is always written first, so skip it in the remaining tags
     HDict meta = grid.meta();
     String ver = meta.has("ver") ? meta.getStr("ver") : "4.0";
-    out.print("\"meta\": {\"ver\":\""+ver+"\"");
-    writeDictTags(grid.meta(), false);
+    out.print("\"meta\": {\"ver\":" + quote(ver));
+    writeDictTags(grid.meta(), false, "ver");
     out.print("},\n");
 
     // columns
@@ -96,7 +96,7 @@ public class HHaysonWriter extends HGridWriter
       out.print("{");
 
       HCol col = grid.col(i);
-      out.print("\"name\":\"" + col.name() + "\"");
+      out.print("\"name\":" + quote(col.name()));
       if (!col.meta().isEmpty())
       {
         out.print(",");
@@ -127,23 +127,25 @@ public class HHaysonWriter extends HGridWriter
   private HHaysonWriter writeDict(HDict dict)
   {
     out.print("{");
-    writeDictTags(dict, true);
+    writeDictTags(dict, true, null);
     out.print("}");
 
     return this;
   }
 
-  private void writeDictTags(HDict dict, boolean first)
+  /** Write the tags of a dict, omitting the tag named skip (may be null) */
+  private void writeDictTags(HDict dict, boolean first, String skip)
   {
     Iterator i = dict.iterator();
     while (i.hasNext())
     {
-      if (first) first = false; else out.print(", ");
       Entry entry = (Entry) i.next();
       String name = (String) entry.getKey();
       HVal val = (HVal) entry.getValue();
+      if (name.equals(skip)) continue;
 
-      out.print("\"" + name + "\":");
+      if (first) first = false; else out.print(", ");
+      out.print(quote(name) + ":");
       writeVal(val);
     }
   }
@@ -183,7 +185,7 @@ public class HHaysonWriter extends HGridWriter
 
   private void writeStr(HStr val)
   {
-    out.print("\"" + val.toString() + "\"");
+    out.print(quote(val.val));
   }
 
   private void writeBool(HBool val)
@@ -200,7 +202,7 @@ public class HHaysonWriter extends HGridWriter
       else if (val.val == Double.POSITIVE_INFINITY)    out.print("\"INF\"");
       else if (val.val == Double.NEGATIVE_INFINITY)    out.print("\"-INF\"");
       else                                             out.print(numToJson(val.val));
-      if (val.unit != null) out.print(",\"unit\":\"" + val.unit + "\"");
+      if (val.unit != null) out.print(",\"unit\":" + quote(val.unit));
       out.print("}");
     }
     else
@@ -218,42 +220,43 @@ public class HHaysonWriter extends HGridWriter
     return String.valueOf(val);
   }
 
+  /** Ref val is the bare id; unlike Zinc there is no leading '@' */
   private void writeRef(HRef val)
   {
-    out.print("{\"_kind\":\"ref\",\"val\":\"" + val.toCode() + "\"");
+    out.print("{\"_kind\":\"ref\",\"val\":" + quote(val.val));
     if (val.dis != null)
-      out.print(",\"dis\":\"" + val.dis + "\"");
+      out.print(",\"dis\":" + quote(val.dis));
     out.print("}");
   }
 
   private void writeDate(HDate val)
   {
-    out.print("{\"_kind\":\"date\",\"val\":\"" + val.toString() + "\"}");
+    out.print("{\"_kind\":\"date\",\"val\":" + quote(val.toString()) + "}");
   }
 
   private void writeTime(HTime val)
   {
-    out.print("{\"_kind\":\"time\",\"val\":\"" + val.toString() + "\"}");
+    out.print("{\"_kind\":\"time\",\"val\":" + quote(val.toString()) + "}");
   }
 
   private void writeDateTime(HDateTime val)
   {
     String zinc = val.toZinc();
     String isoVal = zinc.substring(0, zinc.indexOf(' '));
-    out.print("{\"_kind\":\"dateTime\",\"val\":\"" + isoVal + "\"");
+    out.print("{\"_kind\":\"dateTime\",\"val\":" + quote(isoVal));
     if (!val.tz.equals(HTimeZone.UTC))
-      out.print(",\"tz\":\"" + val.tz + "\"");
+      out.print(",\"tz\":" + quote(val.tz.name));
     out.print("}");
   }
 
   private void writeUri(HUri val)
   {
-    out.print("{\"_kind\":\"uri\",\"val\":\"" + val.toString() + "\"}");
+    out.print("{\"_kind\":\"uri\",\"val\":" + quote(val.toString()) + "}");
   }
 
   private void writeSymbol(HSymbol val)
   {
-    out.print("{\"_kind\":\"symbol\",\"val\":\"" + val.toString() + "\"}");
+    out.print("{\"_kind\":\"symbol\",\"val\":" + quote(val.toString()) + "}");
   }
 
   private void writeCoord(HCoord val)
@@ -263,17 +266,44 @@ public class HHaysonWriter extends HGridWriter
 
   private void writeXStr(HXStr val)
   {
-    out.print("{\"_kind\":\"xstr\",\"type\":\"" + val.type + "\",\"val\":\"" + val.val + "\"}");
+    out.print("{\"_kind\":\"xstr\",\"type\":" + quote(val.type) + ",\"val\":" + quote(val.val) + "}");
   }
 
   private void writeBin(HBin val)
   {
-    out.print("{\"_kind\":\"xstr\",\"type\":\"Bin\",\"val\":\"" + val.mime + "\"}");
+    out.print("{\"_kind\":\"xstr\",\"type\":\"Bin\",\"val\":" + quote(val.mime) + "}");
   }
 
   private void writeSpan(HSpan val)
   {
-    out.print("{\"_kind\":\"xstr\",\"type\":\"Span\",\"val\":\"" + val.val + "\"}");
+    out.print("{\"_kind\":\"xstr\",\"type\":\"Span\",\"val\":" + quote(val.val) + "}");
+  }
+
+  /** Encode a string as a JSON string literal, escaping quotes,
+      backslashes and control characters per RFC 8259 */
+  private static String quote(String s)
+  {
+    StringBuilder sb = new StringBuilder(s.length() + 2);
+    sb.append('"');
+    for (int i = 0; i < s.length(); i++)
+    {
+      char c = s.charAt(i);
+      switch (c)
+      {
+        case '"':  sb.append("\\\""); break;
+        case '\\': sb.append("\\\\"); break;
+        case '\n': sb.append("\\n");  break;
+        case '\r': sb.append("\\r");  break;
+        case '\t': sb.append("\\t");  break;
+        case '\b': sb.append("\\b");  break;
+        case '\f': sb.append("\\f");  break;
+        default:
+          if (c < 0x20) sb.append(String.format("\\u%04x", (int)c));
+          else sb.append(c);
+      }
+    }
+    sb.append('"');
+    return sb.toString();
   }
 
   /* Flush the underlying output stream */
