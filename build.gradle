@@ -30,7 +30,10 @@ repositories {
 }
 
 dependencies {
-    providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+    compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
+
+    // implementation 'org.apache.tomcat.embed:tomcat-embed-core:9.0.82'
+    // implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:9.0.82'
 
     // Use TestNG framework, also requires calling test.useTestNG() below
     testImplementation 'org.testng:testng:7.1.0'
